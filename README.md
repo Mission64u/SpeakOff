@@ -8,11 +8,12 @@ A live, multi-team impromptu speaking game for club events. Teams submit topics 
 
 ## Quick start (host)
 
-1. Open the game link. Under the title, look for **Live · room: main**. That means it is connected.
-2. Click **Host Mode** and set a PIN. You can now add, rename, and remove teams (2 to 6) and enter each team's rep name.
-3. Type the **Timer** and **Grammarian** names in the roles bar.
-4. Send players your event link (see [Rooms](#rooms)). Everyone must use the exact same link.
-5. Let teams submit topics, then start the first round.
+1. Open https://mission64u.github.io/SpeakOff/ and tap **Start a New Game**. This creates a game with a random six-character code.
+2. Under the title, look for **Live · game: YOURCODE**. That means it is connected.
+3. Click **Host Mode** and set a PIN. You can now add, rename, and remove teams (2 to 6) and enter each team's rep name. The **Invite players** box also appears (see [Game codes and QR](#game-codes-and-qr)).
+4. Type the **Timer** and **Grammarian** names in the roles bar.
+5. Share the QR code, join link, or game code with your players.
+6. Let teams submit topics, then start the first round.
 
 ## How a round works
 
@@ -25,6 +26,7 @@ A live, multi-team impromptu speaking game for club events. Teams submit topics 
 
 ## For players
 
+- Scan the host's QR code or tap the join link. Or open https://mission64u.github.io/SpeakOff/ and type the game code.
 - Find your team's card near the bottom of the page.
 - Type a topic (150 characters max) and tap **Add Topic**. Only a running count is shown. Topics stay hidden until one is drawn.
 - When a speaker is up, rate them on the five criteria and tap **Submit My Rating**.
@@ -33,19 +35,18 @@ A live, multi-team impromptu speaking game for club events. Teams submit topics 
 
 Click **Present Mode** to hide setup panels, the roles bar, the evaluation panel, the Grammarian's Report, and the topic boxes, for a clean projector or screen-share view. It affects only the device you click it on.
 
-## Rooms
+## Game codes and QR
 
-A room is a separate game with its own teams, scores, topics, ratings, and notes. Choose a room by adding `?room=` and a name to the end of the link:
+Every game is separate, with its own teams, scores, topics, ratings, and notes. Each game is identified by a random six-character code.
 
-| Link | Room |
-|---|---|
-| `https://mission64u.github.io/SpeakOff/` | `main` (default, good for practice) |
-| `https://mission64u.github.io/SpeakOff/?room=november` | `november` |
-
-- Rooms are created automatically the first time someone opens the link. No setup is needed in GitHub or Firebase.
-- Use letters, numbers, hyphens, and underscores (up to 40 characters). Capitalization counts, so lowercase is safest.
-- Each room sets its own Host PIN the first time Host Mode is used.
-- To run a fresh game, use a new room name instead of reusing an old one.
+- **Start a game:** On the main page, tap **Start a New Game**. Or, in Host Mode, tap **New Game Code** in the Invite players box.
+- **Invite players:** The Invite players box (visible to the host after Host Mode is on) shows the game code, a QR code, and the join link, with Copy buttons. It also shows in Present Mode, so you can project it.
+- **Join a game:** Players scan the QR code or tap the link. Or they open the main page and type the code on the join screen.
+- **Different clubs:** Each club can run its own game with its own code, or several clubs can play as teams in one game (up to six teams).
+- **Fresh game:** Use a new code. Old games stay in the database and are harmless.
+- **Code rules:** Codes are not case-sensitive. A link ending in `?room=` followed by a code (for example `?room=k7m2q9`) opens that game directly. Letters, numbers, hyphens, and underscores only, up to 40 characters.
+- **Keep it private:** A game code works like a password. Anyone who has the code or link can join, so share it only with your players.
+- Each game sets its own Host PIN the first time Host Mode is used.
 
 ## Good to know
 
@@ -74,7 +75,7 @@ A room is a separate game with its own teams, scores, topics, ratings, and notes
 2. In this repository, choose **Add file → Upload files**, upload the new `index.html` (the same name replaces the old one), and click **Commit changes**.
 3. Wait a minute or two, then refresh the game link.
 
-**Clearing old games:** Old rooms stay in the database. They are harmless, but you can delete them in Firebase under **Firestore Database → Data → rooms**.
+**Clearing old games:** Old games stay in the database. They are harmless, but you can delete them in Firebase under **Firestore Database → Data → rooms**.
 
 ## Troubleshooting
 
@@ -83,6 +84,8 @@ A room is a separate game with its own teams, scores, topics, ratings, and notes
 | Yellow line: "Not connected yet" | The Firebase settings are missing or didn't load. Check the `FIREBASE_CONFIG` block in `index.html`. |
 | Red line: "Connection problem" | Check the Firestore rules and the expiry date. Confirm the `apiKey` was copied exactly. |
 | 404 page | Wait a couple of minutes. Confirm the file is named `index.html` and the repository is Public. |
-| Add Team box missing | Turn on Host Mode. Team editing is locked until then. |
-| Players see an empty game | They may be in a different room. Make sure everyone uses the exact same link. |
+| Add Team box or Invite players box missing | Turn on Host Mode. Both are hidden until then. |
+| Players see an empty game | They may be in a different game. Make sure everyone uses the same code or QR. |
+| Join screen says to enter a code | The link was missing the game code. Scan the QR code again, or type the code. |
+| QR code shows "QR unavailable" | The QR tool couldn't load. Use the join link or game code instead, or paste the link into any free QR generator. |
 | Changes not showing after an update | Refresh the page, or clear the browser cache. |
