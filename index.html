@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speak Off — Impromptu Challenge</title>
+<style>
+  :root {
+    --navy: #0B4F6C;
+    --navy-dk: #073A50;
+    --gold: #F4A300;
+    --coral: #F0563D;
+    --mint: #1FB6A6;
+    --sky: #1D8FE1;
+    --plum: #8E3B8F;
+    --ink: #1E2430;
+    --sub: #5B6472;
+    --line: #E1E6EC;
+    --bg: #F5F7FA;
+    --card: #FFFFFF;
+    --shadow: 0 2px 10px rgba(11,79,108,0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #EAF0F6; --sub: #A9B4C2; --line: #2A3542;
+      --bg: #0E1620; --card: #14202B; --shadow: 0 2px 14px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #EAF0F6; --sub: #A9B4C2; --line: #2A3542;
+    --bg: #0E1620; --card: #14202B; --shadow: 0 2px 14px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 22px 18px 60px; }
+  .top {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .eventname {
+    font-size: clamp(1.5rem, 4vw, 2.3rem); font-weight: 800; border: none; background: transparent;
+    color: var(--navy); width: 100%; max-width: 560px; padding: 2px 0; outline: none;
+  }
+  .eventname:focus { border-bottom: 2px dashed var(--gold); }
+  .tagline { color: var(--sub); font-size: 0.95rem; margin-top: 2px; }
+  .present-btn {
+    border: none; border-radius: 999px; padding: 10px 18px; font-weight: 700; cursor: pointer;
+    background: var(--navy); color: white; font-size: 0.9rem; white-space: nowrap;
+  }
+  .present-btn:hover { filter: brightness(1.1); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .host-btn {
+    border: none; border-radius: 999px; padding: 10px 18px; font-weight: 700; cursor: pointer;
+    background: var(--gold); color: var(--navy-dk); font-size: 0.9rem; white-space: nowrap;
+  }
+  .host-btn.on { background: var(--mint); color: white; }
+  .host-btn:hover { filter: brightness(1.1); }
+  #teamsSection.locked .club-name-input, #teamsSection.locked .rep-input { pointer-events: none; opacity: 0.85; }
+  #teamsSection.locked .remove-club, #teamsSection.locked .add-club-card { display: none !important; }
+  .privacy-note {
+    display: flex; align-items: center; gap: 8px; color: var(--sub); font-size: 0.82rem; margin: 4px 0 18px;
+    background: var(--card); border-radius: 10px; padding: 10px 14px; box-shadow: var(--shadow);
+  }
+  .present .privacy-note, .present .host-btn { display: none !important; }
+
+  .scoreboard {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 10px;
+  }
+  .score-card {
+    background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 16px; text-align: center;
+    border-top: 6px solid var(--sky); position: relative;
+  }
+  .score-card .remove-club {
+    position: absolute; top: 6px; right: 8px; border: none; background: transparent; color: var(--sub);
+    cursor: pointer; font-size: 0.95rem; line-height: 1; padding: 2px 4px; border-radius: 6px;
+  }
+  .score-card .remove-club:hover { background: var(--bg); color: var(--coral); }
+  .club-name-input {
+    width: 100%; text-align: center; font-weight: 800; font-size: 1.05rem; border: none; background: transparent;
+    color: var(--ink); outline: none; margin-bottom: 6px; padding-right: 14px;
+  }
+  .club-name-input:focus { text-decoration: underline dotted var(--gold); }
+  .score-num { font-size: clamp(2.2rem, 5vw, 3rem); font-weight: 900; color: var(--navy); line-height: 1; margin: 6px 0; }
+  .score-btns { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+  .score-btns button {
+    border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-weight: 700; cursor: pointer; font-size: 0.8rem;
+    background: var(--bg); color: var(--ink);
+  }
+  .score-btns button:hover { background: var(--gold); color: var(--navy-dk); border-color: var(--gold); }
+
+  .add-club-card {
+    background: var(--card); border: 2px dashed var(--line); border-radius: 14px; padding: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  }
+  .add-club-card input {
+    width: 100%; text-align: center; border: 1px solid var(--line); border-radius: 8px; padding: 8px;
+    background: var(--bg); color: var(--ink); font-size: 0.9rem;
+  }
+  .add-club-card button {
+    border: none; border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; background: var(--mint);
+    color: white; width: 100%;
+  }
+  .add-club-card button:hover { filter: brightness(1.08); }
+  .club-count-note { color: var(--sub); font-size: 0.8rem; margin: 0 0 22px; }
+
+  .stage {
+    background: var(--navy); color: white; border-radius: 18px; padding: 28px 24px; margin-bottom: 22px;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .stage::before {
+    content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.12);
+  }
+  .turn-label {
+    text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.8rem; font-weight: 700; color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .topic-text {
+    font-size: clamp(1.4rem, 4vw, 2.1rem); font-weight: 800; line-height: 1.3; min-height: 2.6em;
+    display: flex; align-items: center;
+  }
+  .topic-text.empty { color: rgba(255,255,255,0.55); font-weight: 600; font-size: 1.15rem; }
+
+  .timer-row { display: flex; align-items: center; gap: 16px; margin-top: 20px; flex-wrap: wrap; }
+  .timer-display { font-size: 2.4rem; font-weight: 900; font-variant-numeric: tabular-nums; min-width: 110px; }
+  .timer-display.warn { color: var(--gold); }
+  .timer-display.danger { color: var(--coral); }
+  .stage-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stage-btns button { border: none; border-radius: 10px; padding: 11px 18px; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
+  .btn-draw { background: var(--gold); color: var(--navy-dk); }
+  .btn-timer { background: rgba(255,255,255,0.14); color: white; }
+  .btn-next { background: var(--mint); color: white; }
+  .stage-btns button:hover { filter: brightness(1.08); }
+  .preset-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .preset-row button { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px; padding: 5px 12px; font-size: 0.8rem; cursor: pointer; }
+  .preset-row button.active { background: var(--gold); color: var(--navy-dk); border-color: var(--gold); }
+
+  .submit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  @media (max-width: 480px) { .scoreboard { grid-template-columns: 1fr 1fr; } }
+  .submit-card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 18px; border-top: 5px solid var(--sky); }
+  .submit-card h3 { margin: 0 0 4px 0; font-size: 1.0rem; color: var(--navy); }
+  .submit-card .count { color: var(--sub); font-size: 0.85rem; margin-bottom: 10px; }
+  .submit-card textarea {
+    width: 100%; min-height: 70px; border-radius: 8px; border: 1px solid var(--line); padding: 10px;
+    font-family: inherit; font-size: 0.95rem; resize: vertical; background: var(--bg); color: var(--ink);
+  }
+  .char-count { color: var(--sub); font-size: 0.78rem; text-align: right; margin-top: 4px; }
+  .char-count.low { color: var(--gold); }
+  .char-count.zero { color: var(--coral); font-weight: 700; }
+  .submit-card button {
+    margin-top: 8px; border: none; border-radius: 8px; padding: 9px 16px; font-weight: 700; cursor: pointer;
+    background: var(--sky); color: white; width: 100%;
+  }
+  .submit-card button:hover { filter: brightness(1.08); }
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--navy-dk); color: white;
+    padding: 10px 18px; border-radius: 999px; font-size: 0.9rem; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease; z-index: 50;
+  }
+  .toast.show { opacity: 1; }
+
+  .present .submit-grid, .present .setup-note, .present .helper, .present .add-club-card, .present .remove-club { display: none !important; }
+  .present .stage { padding: 40px 30px; }
+  .present .topic-text { font-size: clamp(1.8rem, 6vw, 3.2rem); }
+  .present .score-num { font-size: clamp(2.6rem, 7vw, 4rem); }
+  .helper { color: var(--sub); font-size: 0.82rem; margin: 4px 0 18px; }
+
+  .roles-bar {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; background: var(--card);
+    border-radius: 12px; padding: 12px 16px; box-shadow: var(--shadow); align-items: center;
+  }
+  .role-field { display: flex; align-items: center; gap: 6px; font-size: 0.88rem; }
+  .role-field label { color: var(--sub); font-weight: 700; white-space: nowrap; }
+  .role-field input {
+    border: 1px solid var(--line); border-radius: 7px; padding: 5px 8px; background: var(--bg); color: var(--ink);
+    font-size: 0.88rem; width: 140px;
+  }
+
+  .rep-input {
+    width: 100%; text-align: center; font-size: 0.78rem; border: none; background: transparent; color: var(--sub);
+    outline: none; margin-bottom: 4px;
+  }
+  .rep-input:focus { text-decoration: underline dotted var(--gold); }
+  .rep-input::placeholder { color: var(--sub); opacity: 0.7; }
+
+  .grammarian-box { margin-top: 16px; }
+  .grammarian-box label { display: block; color: rgba(255,255,255,0.7); font-size: 0.78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .grammarian-box textarea {
+    width: 100%; min-height: 50px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08); color: white; padding: 8px 10px; font-family: inherit; font-size: 0.9rem;
+    resize: vertical;
+  }
+  .grammarian-save-btn {
+    margin-top: 8px; border: none; border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer;
+    background: var(--gold); color: var(--navy-dk); font-size: 0.85rem;
+  }
+  .grammarian-save-btn:hover { filter: brightness(1.08); }
+  .grammarian-log {
+    margin-top: 22px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 18px;
+  }
+  .grammarian-log h3 { margin: 0 0 4px; color: var(--navy); font-size: 1.0rem; }
+  .grammarian-log .helper { margin: 0 0 12px; }
+  .grammarian-log-list { display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; }
+  .grammarian-log-item { border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 0.88rem; }
+  .grammarian-log-item .who { font-weight: 700; color: var(--navy); font-size: 0.82rem; }
+  .grammarian-log-empty { color: var(--sub); font-size: 0.85rem; }
+  .present .grammarian-log { display: none !important; }
+
+  .eval-panel {
+    background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 18px; margin-bottom: 22px;
+  }
+  .eval-panel h3 { margin: 0 0 4px; color: var(--navy); font-size: 1.05rem; }
+  .eval-panel .helper { margin: 0 0 14px; }
+  .eval-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .eval-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .eval-row .crit-name { font-size: 0.9rem; font-weight: 600; flex: 1 1 200px; }
+  .eval-stars { display: flex; gap: 4px; }
+  .eval-stars button {
+    border: 1px solid var(--line); background: var(--bg); color: var(--sub); border-radius: 6px; width: 32px; height: 32px;
+    cursor: pointer; font-weight: 700;
+  }
+  .eval-stars button.selected { background: var(--gold); color: var(--navy-dk); border-color: var(--gold); }
+  .eval-submit { border: none; border-radius: 8px; padding: 10px 18px; font-weight: 700; cursor: pointer;
+    background: var(--navy); color: white; width: 100%; }
+  .eval-submit:hover { filter: brightness(1.1); }
+  .eval-avg { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .eval-avg-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--sub); margin-bottom: 6px; }
+  .eval-avg-row .bar-track { flex: 1; height: 8px; background: var(--line); border-radius: 4px; margin: 0 10px; overflow: hidden; }
+  .eval-avg-row .bar-fill { height: 100%; background: var(--mint); border-radius: 4px; }
+  .eval-overall { text-align: center; margin-top: 10px; font-weight: 800; color: var(--navy); font-size: 1.1rem; }
+  .eval-suggest {
+    margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+    background: var(--bg); border-radius: 10px; padding: 10px 14px; font-size: 0.9rem;
+  }
+  .eval-suggest button {
+    border: none; border-radius: 8px; padding: 8px 16px; font-weight: 700; cursor: pointer; background: var(--gold);
+    color: var(--navy-dk); font-size: 0.85rem;
+  }
+  .eval-suggest button:hover { filter: brightness(1.08); }
+  .present .eval-panel, .present .roles-bar { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+
+  <div class="top">
+    <div>
+      <input class="eventname" id="eventNameInput" value="Speak Off: Impromptu Challenge" />
+      <div class="tagline">Up to six teams. One mic. Zero prep.</div>
+      <div class="helper" id="connStatus" style="margin:4px 0 0;"></div>
+    </div>
+    <div class="btn-row">
+      <button class="present-btn" id="presentToggle">🖥️ Present Mode</button>
+      <button class="host-btn" id="hostToggle">🔒 Host Mode</button>
+    </div>
+  </div>
+
+  <div class="roles-bar">
+    <div class="role-field"><label>🕐 Timer</label><input id="timerRoleInput" placeholder="Name" maxlength="40" /></div>
+    <div class="role-field"><label>✍️ Grammarian</label><input id="grammarianRoleInput" placeholder="Name" maxlength="40" /></div>
+  </div>
+
+  <div id="teamsSection" class="locked">
+    <div class="scoreboard" id="scoreboard"></div>
+    <div class="add-club-card" id="addClubCard">
+      <input id="newClubInput" placeholder="New team name" maxlength="40" />
+      <button id="addClubBtn">➕ Add Team</button>
+    </div>
+    <div class="club-count-note">At least 2 teams are required. Everyone sees live updates as teams are added or removed.</div>
+  </div>
+
+  <div class="stage">
+    <div class="turn-label" id="turnLabel">Ready to begin</div>
+    <div class="topic-text empty" id="topicText">Press "Draw Topic" to pull a random impromptu question from another team's pool.</div>
+    <div class="timer-row">
+      <div class="timer-display" id="timerDisplay">0:60</div>
+      <div class="stage-btns">
+        <button class="btn-draw" id="drawBtn">🎲 Draw Topic</button>
+        <button class="btn-timer" id="timerBtn">▶️ Start Timer</button>
+        <button class="btn-next" id="nextBtn">✅ Next Turn</button>
+      </div>
+    </div>
+    <div class="preset-row" id="presetRow">
+      <button data-sec="30">30s</button>
+      <button data-sec="60" class="active">60s</button>
+      <button data-sec="90">90s</button>
+      <button data-sec="120">2m</button>
+    </div>
+    <div class="grammarian-box">
+      <label>Grammarian's Notes (this speaker)</label>
+      <textarea id="grammarianNoteInput" placeholder="Filler words, word of the day usage, grammar notes..." maxlength="500"></textarea>
+      <button class="grammarian-save-btn" id="grammarianSaveBtn">💾 Save Note for This Speaker</button>
+    </div>
+  </div>
+
+  <div class="grammarian-log">
+    <h3>Grammarian's Report</h3>
+    <div class="helper">Notes accumulate across the whole event for one closing report — nothing is cleared between rounds.</div>
+    <div class="grammarian-log-list" id="grammarianLogList"></div>
+  </div>
+
+  <div class="eval-panel" id="evalPanel">
+    <h3>Speech Delivery Evaluation</h3>
+    <div class="helper">Any participant can rate the current speaker. Ratings are live and visible to everyone — the host decides final points.</div>
+    <div class="eval-rows" id="evalRows"></div>
+    <button class="eval-submit" id="evalSubmitBtn">Submit My Rating</button>
+    <div class="eval-avg" id="evalAvg"></div>
+  </div>
+
+  <div class="setup-note helper">
+    Every team submits topics below in secret — the host draws a random one from a <em>different</em> team's pool each turn, Family-Feud-style. Topics are capped at 150 characters.
+  </div>
+
+  <div class="privacy-note">🔒 Topics stay private — only a running count is visible to others until a topic is drawn. Not even the host can preview them early.</div>
+  <div class="submit-grid" id="submitGrid"></div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// ====== PASTE YOUR FIREBASE SETTINGS HERE (see setup steps) ======
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDXgbVf81icdYChXXukiIGAneCy90ImryU",
+  authDomain: "speakoff-d3bd7.firebaseapp.com",
+  projectId: "speakoff-d3bd7",
+  storageBucket: "speakoff-d3bd7.firebasestorage.app",
+  messagingSenderId: "569041990716",
+  appId: "1:569041990716:web:99e6958e6aeee8fe027f39"
+};
+// =================================================================
+(function(){
+  const DEFAULT_CLUBS = [ { id: "club-a", name: "Club A", rep: "" }, { id: "club-b", name: "Club B", rep: "" } ];
+  const DEFAULT_STATE = {
+    eventName: "Speak Off: Impromptu Challenge",
+    clubs: DEFAULT_CLUBS,
+    scores: { "club-a": 0, "club-b": 0 },
+    turnIndex: 0,
+    currentQuestion: null,
+    timerDuration: 60,
+    timerEndAt: null,
+    roles: { timer: "", grammarian: "" },
+    grammarNotes: [],
+    hostPin: ""
+  };
+  const TOPIC_MAX = 150;
+  const CARD_COLORS = ["sky","coral","mint","gold","plum","navy"];
+  const CRITERIA = ["Content & Message", "Organization", "Vocal Variety & Delivery", "Body Language & Confidence", "Overall Impact"];
+
+  let db = null, stateRef = null, questionsRef = null, votesRef = null;
+  let gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  let questions = [];
+  let votes = [];
+  let myRatings = {};
+  let stateDocExists = false;
+  let hostUnlocked = false;
+  try { hostUnlocked = localStorage.getItem("speakoff_host_unlocked") === "1"; } catch (e) {}
+
+  function applyLockUI(){
+    $("teamsSection").classList.toggle("locked", !hostUnlocked);
+    const btn = $("hostToggle");
+    btn.textContent = hostUnlocked ? "🔓 Host Mode: ON" : "🔒 Host Mode";
+    btn.classList.toggle("on", hostUnlocked);
+  }
+
+  function toggleHostMode(){
+    if (hostUnlocked) {
+      hostUnlocked = false;
+      try { localStorage.setItem("speakoff_host_unlocked", "0"); } catch (e) {}
+      applyLockUI();
+      toast("Host Mode locked.");
+      return;
+    }
+    if (!gameState.hostPin) {
+      const pin = prompt("Set a Host PIN to protect team names (leave blank for no PIN):");
+      if (pin === null) return;
+      if (pin.trim()) writeState({ hostPin: pin.trim() });
+      hostUnlocked = true;
+    } else {
+      const entered = prompt("Enter Host PIN:");
+      if (entered === null) return;
+      if (entered.trim() !== gameState.hostPin) { toast("Incorrect PIN."); return; }
+      hostUnlocked = true;
+    }
+    try { localStorage.setItem("speakoff_host_unlocked", "1"); } catch (e) {}
+    applyLockUI();
+    toast("Host Mode unlocked — you can rename, add, and remove teams.");
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const uid = () => "club-" + Math.random().toString(36).slice(2, 9);
+
+  function toast(msg){
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(()=> t.classList.remove("show"), 2200);
+  }
+
+  function clubById(id){
+    return gameState.clubs.find(c => c.id === id) || { id, name: "Unknown Club" };
+  }
+  function clubColor(index){ return CARD_COLORS[index % CARD_COLORS.length]; }
+
+  function buildScoreboard(){
+    const el = $("scoreboard");
+    el.innerHTML = "";
+    gameState.clubs.forEach((club, i) => {
+      const card = document.createElement("div");
+      card.className = "score-card";
+      card.style.borderTopColor = "var(--" + clubColor(i) + ")";
+      const removeBtn = gameState.clubs.length > 2 ? '<button class="remove-club" data-remove="' + club.id + '" title="Remove team">✕</button>' : "";
+      card.innerHTML =
+        removeBtn +
+        '<input class="club-name-input" data-name-for="' + club.id + '" value="" />' +
+        '<input class="rep-input" data-rep-for="' + club.id + '" placeholder="Your bravest rep\'s name" maxlength="40" />' +
+        '<div class="score-num" data-score-for="' + club.id + '">0</div>' +
+        '<div class="score-btns">' +
+          '<button data-club="' + club.id + '" data-amt="1">+1</button>' +
+          '<button data-club="' + club.id + '" data-amt="3">+3</button>' +
+          '<button data-club="' + club.id + '" data-amt="5">+5</button>' +
+          '<button data-club="' + club.id + '" data-amt="-1">−1</button>' +
+        '</div>';
+      el.appendChild(card);
+    });
+  }
+
+  function buildSubmitGrid(){
+    const el = $("submitGrid");
+    el.innerHTML = "";
+    gameState.clubs.forEach((club, i) => {
+      const card = document.createElement("div");
+      card.className = "submit-card";
+      card.style.borderTopColor = "var(--" + clubColor(i) + ")";
+      card.innerHTML =
+        '<h3 data-submit-label-for="' + club.id + '">Submit a topic</h3>' +
+        '<div class="count" data-count-for="' + club.id + '">0 topics banked</div>' +
+        '<textarea data-topic-input-for="' + club.id + '" maxlength="' + TOPIC_MAX + '" placeholder="e.g. Convince us why cereal is a soup."></textarea>' +
+        '<div class="char-count" data-charcount-for="' + club.id + '">' + TOPIC_MAX + ' characters left</div>' +
+        '<button data-submit-for="' + club.id + '">Add Topic</button>';
+      el.appendChild(card);
+    });
+  }
+
+  function buildEvalRows(){
+    const el = $("evalRows");
+    el.innerHTML = "";
+    CRITERIA.forEach((crit, ci) => {
+      const row = document.createElement("div");
+      row.className = "eval-row";
+      let starsHtml = '<div class="eval-stars" data-crit-index="' + ci + '">';
+      for (let n = 1; n <= 5; n++) {
+        starsHtml += '<button type="button" data-crit="' + ci + '" data-val="' + n + '">' + n + '</button>';
+      }
+      starsHtml += '</div>';
+      row.innerHTML = '<div class="crit-name">' + crit + '</div>' + starsHtml;
+      el.appendChild(row);
+    });
+    el.querySelectorAll(".eval-stars button").forEach(b => {
+      b.addEventListener("click", () => {
+        const ci = Number(b.dataset.crit);
+        myRatings[ci] = Number(b.dataset.val);
+        el.querySelectorAll('.eval-stars[data-crit-index="' + ci + '"] button').forEach(sb => {
+          sb.classList.toggle("selected", Number(sb.dataset.val) === myRatings[ci]);
+        });
+      });
+    });
+  }
+
+  function resetMyRatings(){
+    myRatings = {};
+    document.querySelectorAll(".eval-stars button").forEach(b => b.classList.remove("selected"));
+  }
+
+  async function submitEvaluation(){
+    if (!gameState.currentQuestion) { toast("No one is currently speaking."); return; }
+    if (Object.keys(myRatings).length < CRITERIA.length) { toast("Please rate all " + CRITERIA.length + " criteria first."); return; }
+    if (!votesRef) { toast("Not connected — try again in a moment."); return; }
+    const roundKey = gameState.currentQuestion.id;
+    const speakerId = gameState.currentQuestion.speakerId;
+    try {
+      await votesRef.add({ roundKey, speakerId, ratings: { ...myRatings }, createdAt: new Date().toISOString() });
+      toast("Rating submitted! 🌟");
+      resetMyRatings();
+    } catch (e) { console.error(e); toast("Couldn't submit rating — try again."); }
+  }
+
+  function saveGrammarNote(){
+    const input = $("grammarianNoteInput");
+    const text = input.value.trim();
+    if (!text) return;
+    const speaker = gameState.currentQuestion ? clubById(gameState.currentQuestion.speakerId).name
+      : (gameState.clubs[gameState.turnIndex % gameState.clubs.length] || {}).name || "Unassigned";
+    const entry = { speaker, text, ts: new Date().toISOString() };
+    const grammarNotes = [...(gameState.grammarNotes || []), entry];
+    writeState({ grammarNotes });
+    input.value = "";
+    toast("Note saved for the report.");
+  }
+
+  function renderGrammarLog(){
+    const el = $("grammarianLogList");
+    const notes = gameState.grammarNotes || [];
+    if (notes.length === 0) {
+      el.innerHTML = '<div class="grammarian-log-empty">No notes saved yet.</div>';
+      return;
+    }
+    el.innerHTML = notes.map(n =>
+      '<div class="grammarian-log-item"><div class="who">' + esc(n.speaker) + '</div>' + esc(n.text) + '</div>'
+    ).join("");
+  }
+
+  function renderEvalPanel(){
+    const active = !!gameState.currentQuestion;
+    $("evalPanel").style.display = active ? "" : "none";
+    if (!active) return;
+    const roundKey = gameState.currentQuestion.id;
+    const roundVotes = votes.filter(v => v.roundKey === roundKey);
+    const avgEl = $("evalAvg");
+    if (roundVotes.length === 0) {
+      avgEl.innerHTML = '<div class="helper" style="margin:0;">No ratings submitted yet for this round.</div>';
+      return;
+    }
+    let rows = "";
+    let overallSum = 0;
+    CRITERIA.forEach((crit, ci) => {
+      const vals = roundVotes.map(v => v.ratings[ci]).filter(v => typeof v === "number");
+      const avg = vals.length ? vals.reduce((a,b)=>a+b,0) / vals.length : 0;
+      overallSum += avg;
+      const pct = (avg / 5) * 100;
+      rows += '<div class="eval-avg-row"><span>' + crit + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span>' + avg.toFixed(1) + '</span></div>';
+    });
+    const overall = (overallSum / CRITERIA.length).toFixed(1);
+    const suggested = Math.max(1, Math.min(5, Math.round(overallSum / CRITERIA.length)));
+    const speakerName = clubById(gameState.currentQuestion.speakerId).name;
+    avgEl.innerHTML = rows +
+      '<div class="eval-overall">Overall: ' + overall + ' / 5 · ' + roundVotes.length + ' rating' + (roundVotes.length===1?"":"s") + '</div>' +
+      '<div class="eval-suggest">Suggested score for ' + esc(speakerName) + ': <strong>' + suggested + ' pts</strong>' +
+      '<button id="applySuggestedBtn" data-club="' + gameState.currentQuestion.speakerId + '" data-pts="' + suggested + '">Apply to Scoreboard</button></div>';
+    const applyBtn = document.getElementById("applySuggestedBtn");
+    if (applyBtn) {
+      applyBtn.addEventListener("click", () => {
+        adjustScore(applyBtn.dataset.club, Number(applyBtn.dataset.pts));
+        toast(speakerName + " awarded " + suggested + " pts!");
+      });
+    }
+  }
+
+  let lastClubIds = "";
+  function render(){
+    const clubIds = gameState.clubs.map(c => c.id).join(",");
+    if (clubIds !== lastClubIds) {
+      buildScoreboard();
+      buildSubmitGrid();
+      wireDynamicEvents();
+      lastClubIds = clubIds;
+    }
+
+    if (document.activeElement !== $("eventNameInput")) $("eventNameInput").value = gameState.eventName;
+    if (document.activeElement !== $("timerRoleInput")) $("timerRoleInput").value = (gameState.roles && gameState.roles.timer) || "";
+    if (document.activeElement !== $("grammarianRoleInput")) $("grammarianRoleInput").value = (gameState.roles && gameState.roles.grammarian) || "";
+    if (document.activeElement !== $("grammarianNoteInput")) {
+      // scratch box always starts empty for the next note — it's not tied to stored state
+    }
+
+    gameState.clubs.forEach(club => {
+      const nameInput = document.querySelector('[data-name-for="' + club.id + '"]');
+      if (nameInput && document.activeElement !== nameInput) nameInput.value = club.name;
+      const repInput = document.querySelector('[data-rep-for="' + club.id + '"]');
+      if (repInput && document.activeElement !== repInput) repInput.value = club.rep || "";
+      const scoreEl = document.querySelector('[data-score-for="' + club.id + '"]');
+      if (scoreEl) scoreEl.textContent = gameState.scores[club.id] || 0;
+      const label = document.querySelector('[data-submit-label-for="' + club.id + '"]');
+      if (label) label.textContent = "Submit a topic for " + club.name;
+      const countEl = document.querySelector('[data-count-for="' + club.id + '"]');
+      if (countEl) {
+        const n = questions.filter(q => q.clubId === club.id && !q.used).length;
+        countEl.textContent = n + " topic" + (n === 1 ? "" : "s") + " banked";
+      }
+    });
+
+    if (gameState.currentQuestion) {
+      $("turnLabel").textContent = clubById(gameState.currentQuestion.speakerId).name + " is speaking";
+      $("topicText").textContent = gameState.currentQuestion.text;
+      $("topicText").classList.remove("empty");
+    } else {
+      const speaker = gameState.clubs[gameState.turnIndex % gameState.clubs.length];
+      $("turnLabel").textContent = "Up next: " + (speaker ? speaker.name : "—");
+      $("topicText").textContent = "Press \"Draw Topic\" to pull a random impromptu question from another team's pool.";
+      $("topicText").classList.add("empty");
+    }
+
+    document.querySelectorAll("#presetRow button").forEach(b => {
+      b.classList.toggle("active", Number(b.dataset.sec) === gameState.timerDuration);
+    });
+
+    renderTimer();
+    renderEvalPanel();
+    renderGrammarLog();
+    applyLockUI();
+  }
+
+  function renderTimer(){
+    const disp = $("timerDisplay");
+    let remaining;
+    if (gameState.timerEndAt) {
+      remaining = Math.max(0, Math.round((new Date(gameState.timerEndAt).getTime() - Date.now()) / 1000));
+    } else {
+      remaining = gameState.timerDuration;
+    }
+    const m = Math.floor(remaining / 60), s = remaining % 60;
+    disp.textContent = m + ":" + String(s).padStart(2, "0");
+    disp.classList.toggle("warn", remaining <= 15 && remaining > 5);
+    disp.classList.toggle("danger", remaining <= 5);
+    $("timerBtn").textContent = gameState.timerEndAt ? "⏸️ Stop Timer" : "▶️ Start Timer";
+  }
+
+  async function writeState(partial){
+    gameState = { ...gameState, ...partial };
+    render();
+    if (!db) return;
+    try {
+      if (!stateDocExists) { await stateRef.set(gameState); stateDocExists = true; }
+      else { await stateRef.update(partial); }
+    } catch (e) { console.error("state write failed", e); }
+  }
+
+  function currentSpeakerId(){
+    const c = gameState.clubs[gameState.turnIndex % gameState.clubs.length];
+    return c ? c.id : null;
+  }
+
+  function pickRandomTopic(){
+    const speakerId = currentSpeakerId();
+    if (!speakerId) return;
+    const pool = questions.filter(q => !q.used && q.clubId !== speakerId);
+    if (pool.length === 0) {
+      toast("No topics left from other teams yet!");
+      return;
+    }
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    resetMyRatings();
+    writeState({ currentQuestion: { id: pick.id, text: pick.text, clubId: pick.clubId, speakerId }, timerEndAt: null });
+  }
+
+  async function nextTurn(){
+    if (gameState.currentQuestion && questionsRef) {
+      try { await questionsRef.doc(gameState.currentQuestion.id).update({ used: true }); }
+      catch (e) { console.error("mark used failed", e); }
+    }
+    const nextIndex = (gameState.turnIndex + 1) % gameState.clubs.length;
+    resetMyRatings();
+    writeState({ turnIndex: nextIndex, currentQuestion: null, timerEndAt: null });
+  }
+
+  function toggleTimer(){
+    if (gameState.timerEndAt) writeState({ timerEndAt: null });
+    else writeState({ timerEndAt: new Date(Date.now() + gameState.timerDuration * 1000).toISOString() });
+  }
+  function setPreset(sec){ writeState({ timerDuration: sec, timerEndAt: null }); }
+
+  async function submitTopic(clubId){
+    const input = document.querySelector('[data-topic-input-for="' + clubId + '"]');
+    const text = input.value.trim().slice(0, TOPIC_MAX);
+    if (!text) return;
+    if (!questionsRef) { toast("Not connected — try again in a moment."); return; }
+    try {
+      await questionsRef.add({ text, clubId, used: false, createdAt: new Date().toISOString() });
+      input.value = "";
+      updateCharCount(clubId);
+      toast("Topic added to " + clubById(clubId).name + "'s pool! 🎉");
+    } catch (e) { console.error(e); toast("Couldn't save that topic — try again."); }
+  }
+
+  function updateCharCount(clubId){
+    const input = document.querySelector('[data-topic-input-for="' + clubId + '"]');
+    const counter = document.querySelector('[data-charcount-for="' + clubId + '"]');
+    if (!input || !counter) return;
+    const remaining = TOPIC_MAX - input.value.length;
+    counter.textContent = remaining + " character" + (remaining === 1 ? "" : "s") + " left";
+    counter.classList.toggle("low", remaining <= 30 && remaining > 0);
+    counter.classList.toggle("zero", remaining <= 0);
+  }
+
+  function adjustScore(clubId, amt){
+    const scores = { ...gameState.scores };
+    scores[clubId] = (scores[clubId] || 0) + amt;
+    writeState({ scores });
+  }
+
+  function addClub(){
+    if (!hostUnlocked) { toast("Enable Host Mode to add teams."); return; }
+    const input = $("newClubInput");
+    const name = input.value.trim();
+    if (!name) return;
+    if (gameState.clubs.length >= 6) { toast("Max 6 clubs at once — that keeps the board readable."); return; }
+    const id = uid();
+    const clubs = [...gameState.clubs, { id, name, rep: "" }];
+    const scores = { ...gameState.scores, [id]: 0 };
+    input.value = "";
+    writeState({ clubs, scores });
+    toast(name + " added to the challenge!");
+  }
+
+  function removeClub(clubId){
+    if (!hostUnlocked) { toast("Enable Host Mode to remove teams."); return; }
+    if (gameState.clubs.length <= 2) { toast("At least 2 teams are required."); return; }
+    const clubs = gameState.clubs.filter(c => c.id !== clubId);
+    const scores = { ...gameState.scores };
+    delete scores[clubId];
+    let turnIndex = gameState.turnIndex;
+    if (turnIndex >= clubs.length) turnIndex = 0;
+    const currentQuestion = (gameState.currentQuestion && (gameState.currentQuestion.speakerId === clubId)) ? null : gameState.currentQuestion;
+    writeState({ clubs, scores, turnIndex, currentQuestion });
+  }
+
+  function renameClub(clubId, name){
+    if (!hostUnlocked) { toast("Enable Host Mode to rename teams."); render(); return; }
+    const clean = name.trim() || clubById(clubId).name;
+    const clubs = gameState.clubs.map(c => c.id === clubId ? { ...c, name: clean } : c);
+    writeState({ clubs });
+  }
+
+  function renameRep(clubId, rep){
+    if (!hostUnlocked) { toast("Enable Host Mode to edit representatives."); render(); return; }
+    const clubs = gameState.clubs.map(c => c.id === clubId ? { ...c, rep: rep.trim() } : c);
+    writeState({ clubs });
+  }
+
+  function wireDynamicEvents(){
+    document.querySelectorAll("[data-remove]").forEach(b => {
+      b.addEventListener("click", () => removeClub(b.dataset.remove));
+    });
+    document.querySelectorAll("[data-name-for]").forEach(inp => {
+      inp.addEventListener("change", () => renameClub(inp.dataset.nameFor, inp.value));
+    });
+    document.querySelectorAll("[data-rep-for]").forEach(inp => {
+      inp.addEventListener("change", () => renameRep(inp.dataset.repFor, inp.value));
+    });
+    document.querySelectorAll(".score-btns button[data-club]").forEach(b => {
+      b.addEventListener("click", () => adjustScore(b.dataset.club, Number(b.dataset.amt)));
+    });
+    document.querySelectorAll("[data-submit-for]").forEach(b => {
+      b.addEventListener("click", () => submitTopic(b.dataset.submitFor));
+    });
+    document.querySelectorAll("[data-topic-input-for]").forEach(inp => {
+      inp.addEventListener("input", () => updateCharCount(inp.dataset.topicInputFor));
+      updateCharCount(inp.dataset.topicInputFor);
+    });
+  }
+
+  $("eventNameInput").addEventListener("change", (e) => writeState({ eventName: e.target.value || DEFAULT_STATE.eventName }));
+  $("drawBtn").addEventListener("click", pickRandomTopic);
+  $("nextBtn").addEventListener("click", nextTurn);
+  $("timerBtn").addEventListener("click", toggleTimer);
+  $("presetRow").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-sec]");
+    if (btn) setPreset(Number(btn.dataset.sec));
+  });
+  $("addClubBtn").addEventListener("click", addClub);
+  $("newClubInput").addEventListener("keydown", (e) => { if (e.key === "Enter") addClub(); });
+  $("presentToggle").addEventListener("click", () => $("app").classList.toggle("present"));
+  $("hostToggle").addEventListener("click", toggleHostMode);
+  $("timerRoleInput").addEventListener("change", (e) => writeState({ roles: { ...gameState.roles, timer: e.target.value.trim() } }));
+  $("grammarianRoleInput").addEventListener("change", (e) => writeState({ roles: { ...gameState.roles, grammarian: e.target.value.trim() } }));
+  $("grammarianSaveBtn").addEventListener("click", saveGrammarNote);
+  $("evalSubmitBtn").addEventListener("click", submitEvaluation);
+  buildEvalRows();
+
+  setInterval(() => { if (gameState.timerEndAt) renderTimer(); }, 1000);
+
+  render();
+
+  const ROOM = (new URLSearchParams(location.search).get("room") || "main").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40) || "main";
+  function setStatus(msg){ const el = $("connStatus"); if (el) el.textContent = msg; }
+
+  (function connect(){
+    const configured = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf("PASTE") !== 0;
+    if (!window.firebase || !configured) {
+      setStatus("⚠️ Not connected yet — add your Firebase settings to go live. Showing a local preview only.");
+      return;
+    }
+    try {
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db = firebase.firestore();
+      const roomRef = db.collection("rooms").doc(ROOM);
+      stateRef = roomRef.collection("state").doc("game");
+      questionsRef = roomRef.collection("questions");
+      votesRef = roomRef.collection("votes");
+      const onErr = (label) => (err) => { console.error(label, err); setStatus("🔴 Connection problem — check your Firestore rules."); };
+
+      stateRef.onSnapshot((snap) => {
+        setStatus("🟢 Live · room: " + ROOM);
+        if (snap.exists) { stateDocExists = true; gameState = { ...DEFAULT_STATE, ...snap.data() }; }
+        else { stateDocExists = false; }
+        render();
+      }, onErr("state sub error"));
+
+      questionsRef.onSnapshot((qsnap) => {
+        questions = qsnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        render();
+      }, onErr("questions sub error"));
+
+      votesRef.onSnapshot((vsnap) => {
+        votes = vsnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderEvalPanel();
+      }, onErr("votes sub error"));
+    } catch (e) { console.error("firebase connect failed", e); setStatus("🔴 Couldn't connect — check your Firebase settings."); }
+  })();
+})();
+</script>
+</body>
+</html>
