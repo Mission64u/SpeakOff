@@ -244,9 +244,72 @@
   }
   .eval-suggest button:hover { filter: brightness(1.08); }
   .present .eval-panel, .present .roles-bar { display: none !important; }
+
+  .howto { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 16px; padding: 4px 16px; }
+  .howto summary { cursor: pointer; font-weight: 800; color: var(--navy); padding: 10px 0; font-size: 0.98rem; }
+  .howto h4 { margin: 14px 0 6px; color: var(--navy); font-size: 0.92rem; }
+  .howto ol, .howto ul { margin: 0 0 10px; padding-left: 20px; font-size: 0.88rem; line-height: 1.55; }
+  .howto .tip { background: var(--bg); border-radius: 8px; padding: 8px 12px; font-size: 0.84rem; color: var(--sub); margin: 8px 0 12px; }
+  .present .howto { display: none !important; }
+
+  .join-screen {
+    display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 24px; background: var(--bg);
+  }
+  .join-card {
+    background: var(--card); border-radius: 18px; box-shadow: var(--shadow); padding: 32px 28px; max-width: 420px; width: 100%;
+    text-align: center; border-top: 6px solid var(--gold);
+  }
+  .join-card h1 { margin: 0 0 4px; color: var(--navy); font-size: 1.7rem; }
+  .join-card .tagline { margin-bottom: 22px; }
+  .join-card h2 { margin: 0 0 10px; font-size: 1rem; color: var(--ink); }
+  .join-card input {
+    width: 100%; text-align: center; font-size: 1.6rem; font-weight: 800; letter-spacing: 6px; text-transform: uppercase;
+    border: 2px solid var(--line); border-radius: 12px; padding: 12px; background: var(--bg); color: var(--ink); outline: none;
+  }
+  .join-card input:focus { border-color: var(--gold); }
+  .join-card button {
+    width: 100%; border: none; border-radius: 12px; padding: 13px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 12px;
+  }
+  .join-card .join-go { background: var(--navy); color: #fff; }
+  .join-card .join-new { background: var(--gold); color: var(--navy-dk); }
+  .join-card button:hover { filter: brightness(1.08); }
+  .join-card .or { color: var(--sub); font-size: 0.85rem; margin: 20px 0 4px; }
+  .join-error { color: var(--coral); font-size: 0.85rem; min-height: 1.2em; margin-top: 8px; font-weight: 700; }
+
+  .share-panel {
+    display: none; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 18px; margin-bottom: 16px;
+    border-top: 5px solid var(--gold); gap: 22px; align-items: center; flex-wrap: wrap; justify-content: center;
+  }
+  .share-info { flex: 1 1 260px; min-width: 240px; }
+  .share-info h3 { margin: 0 0 4px; color: var(--navy); font-size: 1.0rem; }
+  .share-label { color: var(--sub); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
+  .share-code { font-size: clamp(2rem, 6vw, 3rem); font-weight: 900; letter-spacing: 8px; color: var(--navy); line-height: 1.1; }
+  .share-link { font-size: 0.8rem; color: var(--sub); word-break: break-all; margin-top: 2px; }
+  .share-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .share-btns button {
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-weight: 700; cursor: pointer; font-size: 0.82rem;
+    background: var(--bg); color: var(--ink);
+  }
+  .share-btns button:hover { background: var(--gold); color: var(--navy-dk); border-color: var(--gold); }
+  .qr-box { background: #fff; padding: 8px; border-radius: 12px; width: 190px; height: 190px; display: flex; align-items: center; justify-content: center;
+    color: #333; font-size: 0.78rem; text-align: center; }
+  .qr-box svg { width: 100%; height: 100%; display: block; }
 </style>
 </head>
 <body>
+<div class="join-screen" id="joinScreen">
+  <div class="join-card">
+    <h1>Speak Off</h1>
+    <div class="tagline">Impromptu Challenge · One mic. Zero prep.</div>
+    <h2>Join a game</h2>
+    <input id="joinCodeInput" maxlength="40" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+    <button class="join-go" id="joinGoBtn">Join Game</button>
+    <div class="join-error" id="joinError"></div>
+    <div class="or">Hosting this event?</div>
+    <button class="join-new" id="joinNewBtn">🎲 Start a New Game</button>
+  </div>
+</div>
+
 <div class="wrap" id="app">
 
   <div class="top">
@@ -260,6 +323,53 @@
       <button class="host-btn" id="hostToggle">🔒 Host Mode</button>
     </div>
   </div>
+
+  <div class="share-panel" id="sharePanel">
+    <div class="qr-box" id="qrBox"></div>
+    <div class="share-info">
+      <h3>Invite players</h3>
+      <div class="share-label">Game code</div>
+      <div class="share-code" id="shareCode"></div>
+      <div class="share-label">Join link</div>
+      <div class="share-link" id="shareLink"></div>
+      <div class="share-btns">
+        <button id="copyCodeBtn">📋 Copy Code</button>
+        <button id="copyLinkBtn">🔗 Copy Link</button>
+        <button id="newGameBtn">🎲 New Game Code</button>
+      </div>
+    </div>
+  </div>
+
+  <details class="howto" id="howTo">
+    <summary>📖 How to Play</summary>
+
+    <h4>Host: before you start</h4>
+    <ol>
+      <li>Click <strong>Host Mode</strong> and set a PIN. Add, rename, or remove teams (2 to 6) and enter each team's rep name.</li>
+      <li>Enter the <strong>Timer</strong> and <strong>Grammarian</strong> names in the bar below.</li>
+      <li>Share the <strong>QR code</strong>, <strong>join link</strong>, or <strong>game code</strong> from the Invite players box (it appears when Host Mode is on). Players scan the code, tap the link, or type the code on the main page. Everyone must be in the same game.</li>
+      <li>Give teams a few minutes to submit topics (see below). Each team should bank at least a few topics.</li>
+    </ol>
+
+    <h4>Players: submit topics in secret</h4>
+    <ol>
+      <li>Find your team's card near the bottom of the page.</li>
+      <li>Type a fun impromptu question (150 characters max) and tap <strong>Add Topic</strong>.</li>
+      <li>Only a running count shows. Topics stay hidden until one is drawn.</li>
+    </ol>
+
+    <h4>Running a round</h4>
+    <ol>
+      <li>The stage shows which team speaks next. The host taps <strong>Draw Topic</strong> to pull a random topic written by a <em>different</em> team.</li>
+      <li>The Timer role picks 30s, 60s, 90s, or 2m, then taps <strong>Start Timer</strong> when the speaker begins. The clock turns gold, then red, as time runs out.</li>
+      <li>The Grammarian types notes in the box and taps <strong>Save Note</strong>. All notes collect in the Grammarian's Report for one closing summary.</li>
+      <li>Everyone except the speaker rates the speech on the five criteria (1 to 5) and taps <strong>Submit My Rating</strong>. Rate once per speaker.</li>
+      <li>The host reviews the averages, then taps <strong>Apply to Scoreboard</strong> for the suggested points, or uses +1, +3, +5, or −1 to decide the score.</li>
+      <li>Tap <strong>Next Turn</strong>. The used topic is retired and the next team is up.</li>
+    </ol>
+
+    <div class="tip"><strong>Tips:</strong> Use <strong>Present Mode</strong> on the projector or shared screen to hide the setup panels. Only the host should press Draw Topic, Timer, Next Turn, and the score buttons, because those controls work on every device. To start a fresh game, tap <strong>New Game Code</strong> in the Invite players box.</div>
+  </details>
 
   <div class="roles-bar">
     <div class="role-field"><label>🕐 Timer</label><input id="timerRoleInput" placeholder="Name" maxlength="40" /></div>
@@ -325,6 +435,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
 // ====== PASTE YOUR FIREBASE SETTINGS HERE (see setup steps) ======
 const FIREBASE_CONFIG = {
@@ -361,19 +472,23 @@ const FIREBASE_CONFIG = {
   let myRatings = {};
   let stateDocExists = false;
   let hostUnlocked = false;
-  try { hostUnlocked = localStorage.getItem("speakoff_host_unlocked") === "1"; } catch (e) {}
+  const ROOM = (new URLSearchParams(location.search).get("room") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40);
+  const HOST_KEY = "speakoff_host_unlocked_" + ROOM;
+  try { hostUnlocked = localStorage.getItem(HOST_KEY) === "1"; } catch (e) {}
 
   function applyLockUI(){
     $("teamsSection").classList.toggle("locked", !hostUnlocked);
     const btn = $("hostToggle");
     btn.textContent = hostUnlocked ? "🔓 Host Mode: ON" : "🔒 Host Mode";
     btn.classList.toggle("on", hostUnlocked);
+    const sp = $("sharePanel");
+    if (sp) sp.style.display = (hostUnlocked && ROOM) ? "flex" : "none";
   }
 
   function toggleHostMode(){
     if (hostUnlocked) {
       hostUnlocked = false;
-      try { localStorage.setItem("speakoff_host_unlocked", "0"); } catch (e) {}
+      try { localStorage.setItem(HOST_KEY, "0"); } catch (e) {}
       applyLockUI();
       toast("Host Mode locked.");
       return;
@@ -389,7 +504,7 @@ const FIREBASE_CONFIG = {
       if (entered.trim() !== gameState.hostPin) { toast("Incorrect PIN."); return; }
       hostUnlocked = true;
     }
-    try { localStorage.setItem("speakoff_host_unlocked", "1"); } catch (e) {}
+    try { localStorage.setItem(HOST_KEY, "1"); } catch (e) {}
     applyLockUI();
     toast("Host Mode unlocked — you can rename, add, and remove teams.");
   }
@@ -779,10 +894,69 @@ const FIREBASE_CONFIG = {
 
   render();
 
-  const ROOM = (new URLSearchParams(location.search).get("room") || "main").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40) || "main";
   function setStatus(msg){ const el = $("connStatus"); if (el) el.textContent = msg; }
 
+  // ---- Game code, join screen, and QR sharing
+  const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  function makeGameCode(){
+    const buf = new Uint32Array(6);
+    (window.crypto || window.msCrypto).getRandomValues(buf);
+    return Array.from(buf, n => CODE_CHARS[n % CODE_CHARS.length]).join("");
+  }
+  function cleanCode(v){ return String(v || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40); }
+  function goToRoom(code){ location.href = location.pathname + "?room=" + encodeURIComponent(code); }
+  function shareLinkUrl(){ return location.origin + location.pathname + "?room=" + encodeURIComponent(ROOM); }
+
+  function renderQR(){
+    const box = $("qrBox");
+    if (!box || !ROOM) return;
+    if (typeof qrcode === "function") {
+      try {
+        const qr = qrcode(0, "M");
+        qr.addData(shareLinkUrl());
+        qr.make();
+        box.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+        return;
+      } catch (e) { console.error("qr failed", e); }
+    }
+    box.textContent = "QR unavailable. Paste the link into any free QR generator.";
+  }
+
+  async function copyText(text, okMsg){
+    try { await navigator.clipboard.writeText(text); toast(okMsg); }
+    catch (e) { window.prompt("Copy this:", text); }
+  }
+
+  function setupJoinAndShare(){
+    if (!ROOM) {
+      $("app").style.display = "none";
+      $("joinScreen").style.display = "flex";
+      const input = $("joinCodeInput");
+      const err = $("joinError");
+      const join = () => {
+        const code = cleanCode(input.value);
+        if (code.length < 3) { err.textContent = "Enter the game code your host shared."; return; }
+        goToRoom(code);
+      };
+      $("joinGoBtn").addEventListener("click", join);
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") join(); });
+      $("joinNewBtn").addEventListener("click", () => goToRoom(makeGameCode().toLowerCase()));
+      return;
+    }
+    $("shareCode").textContent = ROOM.toUpperCase();
+    $("shareLink").textContent = shareLinkUrl();
+    renderQR();
+    $("copyCodeBtn").addEventListener("click", () => copyText(ROOM.toUpperCase(), "Game code copied."));
+    $("copyLinkBtn").addEventListener("click", () => copyText(shareLinkUrl(), "Join link copied."));
+    $("newGameBtn").addEventListener("click", () => {
+      if (confirm("Start a brand-new game with a new code? Players will need the new code or QR to join it.")) goToRoom(makeGameCode().toLowerCase());
+    });
+  }
+  window.__renderQR = renderQR;
+  setupJoinAndShare();
+
   (function connect(){
+    if (!ROOM) return;
     const configured = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf("PASTE") !== 0;
     if (!window.firebase || !configured) {
       setStatus("⚠️ Not connected yet — add your Firebase settings to go live. Showing a local preview only.");
@@ -798,7 +972,7 @@ const FIREBASE_CONFIG = {
       const onErr = (label) => (err) => { console.error(label, err); setStatus("🔴 Connection problem — check your Firestore rules."); };
 
       stateRef.onSnapshot((snap) => {
-        setStatus("🟢 Live · room: " + ROOM);
+        setStatus("🟢 Live · game: " + ROOM.toUpperCase());
         if (snap.exists) { stateDocExists = true; gameState = { ...DEFAULT_STATE, ...snap.data() }; }
         else { stateDocExists = false; }
         render();
