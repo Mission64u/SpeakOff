@@ -252,6 +252,33 @@
   .howto .tip { background: var(--bg); border-radius: 8px; padding: 8px 12px; font-size: 0.84rem; color: var(--sub); margin: 8px 0 12px; }
   .present .howto { display: none !important; }
 
+  .import-panel { display: none; background: var(--card); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 16px; padding: 4px 16px; }
+  .import-panel summary { cursor: pointer; font-weight: 800; color: var(--navy); padding: 10px 0; font-size: 0.98rem; }
+  .import-body { padding-bottom: 14px; }
+  .import-label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; margin: 12px 0 4px; }
+  .import-body select, .import-body textarea, .import-body input[type="file"] {
+    width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--bg); color: var(--ink); font-size: 0.9rem; font-family: inherit;
+  }
+  .import-body textarea { resize: vertical; }
+  .import-check { display: flex; align-items: center; gap: 8px; font-size: 0.86rem; margin-top: 10px; cursor: pointer; }
+  .import-preview { background: var(--bg); border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 0.85rem; color: var(--ink); line-height: 1.5; min-height: 1.2em; }
+  .import-go { margin-top: 12px; border: none; border-radius: 10px; padding: 11px 18px; background: var(--navy); color: #fff; font-weight: 800; cursor: pointer; font-size: 0.95rem; }
+  .import-go:disabled { opacity: 0.45; cursor: not-allowed; }
+  .present .import-panel { display: none !important; }
+
+  .supply-panel { display: none; background: var(--card); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 16px; padding: 4px 16px; }
+  .supply-panel summary { cursor: pointer; font-weight: 800; color: var(--navy); padding: 10px 0; font-size: 0.98rem; }
+  .supply-body { padding-bottom: 12px; overflow-x: auto; }
+  .supply-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+  .supply-table th { text-align: left; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--sub); padding: 6px 8px; border-bottom: 2px solid var(--line); }
+  .supply-table td { padding: 7px 8px; border-bottom: 1px solid var(--line); }
+  .supply-table td.num, .supply-table th.num { text-align: center; }
+  .supply-table tr.next td { background: var(--bg); font-weight: 800; }
+  .supply-table td.low { color: var(--coral); font-weight: 800; }
+  .supply-table td.zero { color: #fff; background: var(--coral); font-weight: 900; }
+  .supply-note { font-size: 0.8rem; color: var(--sub); margin-top: 8px; line-height: 1.45; }
+  .present .supply-panel { display: none !important; }
+
   .join-screen {
     display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 24px; background: var(--bg);
   }
@@ -315,7 +342,7 @@
   <div class="top">
     <div>
       <input class="eventname" id="eventNameInput" value="Speak Off: Impromptu Challenge" />
-      <div class="tagline">Up to six teams. One mic. Zero prep.</div>
+      <div class="tagline">Up to ten teams. One mic. Zero prep.</div>
       <div class="helper" id="connStatus" style="margin:4px 0 0;"></div>
     </div>
     <div class="btn-row">
@@ -345,10 +372,11 @@
 
     <h4>Host: before you start</h4>
     <ol>
-      <li>Click <strong>Host Mode</strong> and set a PIN. Add, rename, or remove teams (2 to 6) and enter each team's rep name.</li>
+      <li>Click <strong>Host Mode</strong> and set a PIN. Add, rename, or remove teams (2 to 10) and enter each team's rep name.</li>
       <li>Enter the <strong>Timer</strong> and <strong>Grammarian</strong> names in the bar below.</li>
       <li>Share the <strong>QR code</strong>, <strong>join link</strong>, or <strong>game code</strong> from the Invite players box (it appears when Host Mode is on). Players scan the code, tap the link, or type the code on the main page. Everyone must be in the same game.</li>
-      <li>Give teams a few minutes to submit topics (see below). Each team should bank at least a few topics.</li>
+      <li>Get prompts into each team's pool. Either teams type topics live below, or you open <strong>Import Prompts for a Team</strong> and paste or upload a list for each team (one prompt per line, or a .csv file).</li>
+      <li>Optional: add a few <strong>⭐ Host wildcards</strong> from the same import box. Any team can draw them, and they never take a turn. Watch the <strong>Prompt Supply</strong> box to see which teams are running low.</li>
     </ol>
 
     <h4>Players: submit topics in secret</h4>
@@ -427,7 +455,40 @@
     Every team submits topics below in secret — the host draws a random one from a <em>different</em> team's pool each turn, Family-Feud-style. Topics are capped at 150 characters.
   </div>
 
-  <div class="privacy-note">🔒 Topics stay private — only a running count is visible to others until a topic is drawn. Not even the host can preview them early.</div>
+  <div class="privacy-note">🔒 Topics stay private — only a running count is visible to others until a topic is drawn.</div>
+
+  <details class="supply-panel" id="supplyPanel">
+    <summary id="supplySummary">📊 Prompt Supply (Host)</summary>
+    <div class="supply-body" id="supplyBody"></div>
+  </details>
+
+  <details class="import-panel" id="importPanel">
+    <summary>📥 Import Prompts for a Team (Host)</summary>
+    <div class="import-body">
+      <div class="helper">Add a whole list at once, for example prompts a team wrote in a Google Sheet or Form. Paste one prompt per line, or choose a .txt or .csv file. Prompts over 150 characters are shortened.</div>
+
+      <label class="import-label" for="importTeam">Team or pool</label>
+      <select id="importTeam"></select>
+
+      <label class="import-label" for="importText">Paste prompts (one per line)</label>
+      <textarea id="importText" rows="6" placeholder="Convince us why cereal is a soup.&#10;Describe your ideal Monday."></textarea>
+
+      <label class="import-label" for="importFile">Or choose a file (.txt or .csv)</label>
+      <input type="file" id="importFile" accept=".txt,.csv,.tsv,text/plain,text/csv" />
+
+      <label class="import-check" id="importHeaderRow" style="display:none;"><input type="checkbox" id="importHeader" /> First row is a header (skip it)</label>
+      <div id="importColRow" style="display:none;">
+        <label class="import-label" for="importCol">Column that holds the prompts</label>
+        <select id="importCol"></select>
+      </div>
+
+      <label class="import-check"><input type="checkbox" id="importReplace" /> Replace the existing prompts in this pool (removes the ones already saved)</label>
+
+      <div class="import-preview" id="importPreview">Paste or choose a list to see a preview.</div>
+      <button class="import-go" id="importBtn" disabled>Add Prompts to Team</button>
+    </div>
+  </details>
+
   <div class="submit-grid" id="submitGrid"></div>
 
   <div class="toast" id="toast"></div>
@@ -462,12 +523,16 @@ const FIREBASE_CONFIG = {
     hostPin: ""
   };
   const TOPIC_MAX = 150;
+  const MAX_CLUBS = 10;
+  const HOST_POOL = "host";
   const CARD_COLORS = ["sky","coral","mint","gold","plum","navy"];
   const CRITERIA = ["Content & Message", "Organization", "Vocal Variety & Delivery", "Body Language & Confidence", "Overall Impact"];
 
   let db = null, stateRef = null, questionsRef = null, votesRef = null;
   let gameState = JSON.parse(JSON.stringify(DEFAULT_STATE));
   let questions = [];
+  const IMPORT_MAX = 300;
+  let importFileText = null, importFileName = "", importColKey = "";
   let votes = [];
   let myRatings = {};
   let stateDocExists = false;
@@ -483,6 +548,11 @@ const FIREBASE_CONFIG = {
     btn.classList.toggle("on", hostUnlocked);
     const sp = $("sharePanel");
     if (sp) sp.style.display = (hostUnlocked && ROOM) ? "flex" : "none";
+    const ip = $("importPanel");
+    if (ip) ip.style.display = (hostUnlocked && ROOM) ? "block" : "none";
+    const sup = $("supplyPanel");
+    if (sup) sup.style.display = (hostUnlocked && ROOM) ? "block" : "none";
+    renderSupply();
   }
 
   function toggleHostMode(){
@@ -678,6 +748,8 @@ const FIREBASE_CONFIG = {
       wireDynamicEvents();
       lastClubIds = clubIds;
     }
+    refreshImportTeams();
+    renderSupply();
 
     if (document.activeElement !== $("eventNameInput")) $("eventNameInput").value = gameState.eventName;
     if (document.activeElement !== $("timerRoleInput")) $("timerRoleInput").value = (gameState.roles && gameState.roles.timer) || "";
@@ -816,7 +888,7 @@ const FIREBASE_CONFIG = {
     const input = $("newClubInput");
     const name = input.value.trim();
     if (!name) return;
-    if (gameState.clubs.length >= 6) { toast("Max 6 clubs at once — that keeps the board readable."); return; }
+    if (gameState.clubs.length >= MAX_CLUBS) { toast("Max " + MAX_CLUBS + " teams at once — that keeps the board readable."); return; }
     const id = uid();
     const clubs = [...gameState.clubs, { id, name, rep: "" }];
     const scores = { ...gameState.scores, [id]: 0 };
@@ -895,6 +967,243 @@ const FIREBASE_CONFIG = {
   render();
 
   function setStatus(msg){ const el = $("connStatus"); if (el) el.textContent = msg; }
+
+  // ---- Bulk import of prompts (host only)
+  function parseDelimited(text, delim){
+    const rows = []; let row = [], cell = "", inQ = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQ) {
+        if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else inQ = false; }
+        else cell += c;
+      } else if (c === '"' && cell === "") inQ = true;
+      else if (c === delim) { row.push(cell); cell = ""; }
+      else if (c === "\n" || c === "\r") {
+        if (c === "\r" && text[i + 1] === "\n") i++;
+        row.push(cell); rows.push(row); row = []; cell = "";
+      } else cell += c;
+    }
+    if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
+    return rows.filter(r => r.some(x => x.trim() !== ""));
+  }
+
+  function currentImportRows(){
+    const useFile = importFileText !== null;
+    const text = useFile ? importFileText : $("importText").value;
+    let delim = null;
+    if (useFile) {
+      if (/\.csv$/i.test(importFileName)) delim = ",";
+      else if (/\.tsv$/i.test(importFileName)) delim = "\t";
+    } else if (text.indexOf("\t") >= 0) delim = "\t";
+    const rows = delim
+      ? parseDelimited(text, delim)
+      : text.split(/\r?\n/).map(l => [l]).filter(r => r[0].trim() !== "");
+    return { rows, useFile };
+  }
+
+  function refreshImportTeams(){
+    const sel = $("importTeam");
+    if (!sel) return;
+    const key = gameState.clubs.map(c => c.id + ":" + c.name).join("|");
+    if (sel.dataset.key === key) return;
+    const keep = sel.value;
+    sel.innerHTML = "";
+    gameState.clubs.forEach(c => {
+      const o = document.createElement("option");
+      o.value = c.id; o.textContent = c.name;
+      sel.appendChild(o);
+    });
+    const wild = document.createElement("option");
+    wild.value = HOST_POOL; wild.textContent = "⭐ Host wildcards (any team can draw)";
+    sel.appendChild(wild);
+    if (keep && (keep === HOST_POOL || gameState.clubs.some(c => c.id === keep))) sel.value = keep;
+    sel.dataset.key = key;
+    refreshImport();
+  }
+
+  function computeImport(){
+    const { rows, useFile } = currentImportRows();
+    const ncols = rows.reduce((m, r) => Math.max(m, r.length), 0);
+    const showHeader = useFile || ncols > 1;
+    $("importHeaderRow").style.display = showHeader ? "flex" : "none";
+    $("importColRow").style.display = ncols > 1 ? "block" : "none";
+    const skip = showHeader && $("importHeader").checked;
+
+    const colSel = $("importCol");
+    if (ncols > 1) {
+      const labels = [];
+      for (let i = 0; i < ncols; i++) {
+        const h = skip && rows[0] && rows[0][i] ? rows[0][i].trim() : "";
+        labels.push(h || "Column " + (i + 1));
+      }
+      const key = labels.join("|");
+      if (key !== importColKey) {
+        colSel.innerHTML = "";
+        labels.forEach((l, i) => { const o = document.createElement("option"); o.value = i; o.textContent = l; colSel.appendChild(o); });
+        const guess = labels.findIndex(l => !/timestamp|e-?mail|^name$|date|time/i.test(l));
+        colSel.value = guess >= 0 ? guess : 0;
+        importColKey = key;
+      }
+    } else importColKey = "";
+    const col = ncols > 1 ? Number(colSel.value) || 0 : 0;
+
+    const clubId = $("importTeam").value;
+    const replace = $("importReplace").checked;
+    const seen = new Set();
+    if (!replace) questions.filter(q => q.clubId === clubId).forEach(q => seen.add(String(q.text).toLowerCase()));
+
+    let truncated = 0, dupes = 0, capped = false;
+    const prompts = [];
+    rows.slice(skip ? 1 : 0).forEach(r => {
+      let t = String(r[col] || "").replace(/\s+/g, " ").trim();
+      if (!t) return;
+      if (t.length > TOPIC_MAX) { t = t.slice(0, TOPIC_MAX).trim(); truncated++; }
+      const k = t.toLowerCase();
+      if (seen.has(k)) { dupes++; return; }
+      seen.add(k);
+      if (prompts.length >= IMPORT_MAX) { capped = true; return; }
+      prompts.push(t);
+    });
+    return { prompts, truncated, dupes, capped, clubId, replace };
+  }
+
+  function refreshImport(){
+    const info = computeImport();
+    const label = poolLabel(info.clubId);
+    const box = $("importPreview");
+    const btn = $("importBtn");
+    if (!info.prompts.length) {
+      box.textContent = "No prompts found yet. Paste a list or choose a file.";
+      btn.disabled = true;
+      btn.textContent = "Add Prompts to Team";
+      return;
+    }
+    let msg = "Ready to add " + info.prompts.length + " prompt" + (info.prompts.length === 1 ? "" : "s") + " to " + label + ".";
+    if (info.replace) msg += " The existing prompts in this pool will be removed first.";
+    if (info.dupes) msg += " Skipping " + info.dupes + " duplicate" + (info.dupes === 1 ? "" : "s") + ".";
+    if (info.truncated) msg += " " + info.truncated + " shortened to " + TOPIC_MAX + " characters.";
+    if (info.capped) msg += " Only the first " + IMPORT_MAX + " will be added.";
+    msg += " First few: " + info.prompts.slice(0, 3).map(t => "\u201C" + (t.length > 60 ? t.slice(0, 60) + "…" : t) + "\u201D").join("  ");
+    box.textContent = msg;
+    btn.disabled = false;
+    btn.textContent = "Add " + info.prompts.length + " Prompt" + (info.prompts.length === 1 ? "" : "s") + " to " + label;
+  }
+
+  async function doImport(){
+    if (!hostUnlocked) { toast("Turn on Host Mode to import prompts."); return; }
+    if (!db || !questionsRef) { toast("Not connected — try again in a moment."); return; }
+    const info = computeImport();
+    if (!info.prompts.length) return;
+    const label = poolLabel(info.clubId);
+    if (info.replace && !confirm("Replace all existing prompts for " + label + " with these " + info.prompts.length + "?")) return;
+    const ops = [];
+    if (info.replace) questions.filter(q => q.clubId === info.clubId).forEach(q => ops.push({ del: questionsRef.doc(q.id) }));
+    const now = new Date().toISOString();
+    info.prompts.forEach(text => ops.push({ ref: questionsRef.doc(), data: { text, clubId: info.clubId, used: false, createdAt: now, imported: true } }));
+    $("importBtn").disabled = true;
+    try {
+      for (let i = 0; i < ops.length; i += 400) {
+        const batch = db.batch();
+        ops.slice(i, i + 400).forEach(op => { if (op.del) batch.delete(op.del); else batch.set(op.ref, op.data); });
+        await batch.commit();
+      }
+      $("importText").value = "";
+      $("importFile").value = "";
+      importFileText = null; importFileName = "";
+      $("importReplace").checked = false;
+      toast(info.prompts.length + " prompt" + (info.prompts.length === 1 ? "" : "s") + " added to " + label + "! 🎉");
+    } catch (e) {
+      console.error(e);
+      toast("Couldn't save the prompts. Check your connection and try again.");
+    }
+    refreshImport();
+  }
+
+  $("importText").addEventListener("input", () => {
+    if (importFileText !== null) { importFileText = null; importFileName = ""; $("importFile").value = ""; }
+    refreshImport();
+  });
+  $("importFile").addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) { importFileText = null; importFileName = ""; refreshImport(); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      importFileText = String(reader.result || "").replace(/^\uFEFF/, "");
+      importFileName = f.name;
+      $("importText").value = "";
+      importColKey = "";
+      $("importHeader").checked = /\.(csv|tsv)$/i.test(f.name);
+      refreshImport();
+    };
+    reader.onerror = () => toast("Couldn't read that file.");
+    reader.readAsText(f);
+  });
+  ["importTeam", "importCol", "importHeader", "importReplace"].forEach(id => $(id).addEventListener("change", refreshImport));
+  $("importBtn").addEventListener("click", doImport);
+
+  function poolLabel(id){ return id === HOST_POOL ? "Host wildcards" : clubById(id).name; }
+
+  function renderSupply(){
+    const panel = $("supplyPanel");
+    if (!panel || !(hostUnlocked && ROOM)) return;
+    const unused = {}, used = {};
+    questions.forEach(q => {
+      if (q.used) used[q.clubId] = (used[q.clubId] || 0) + 1;
+      else unused[q.clubId] = (unused[q.clubId] || 0) + 1;
+    });
+    let totalUnused = unused[HOST_POOL] || 0;
+    gameState.clubs.forEach(c => { totalUnused += unused[c.id] || 0; });
+
+    const nextClub = gameState.clubs.length ? gameState.clubs[gameState.turnIndex % gameState.clubs.length] : null;
+    const table = document.createElement("table");
+    table.className = "supply-table";
+    const head = document.createElement("tr");
+    ["Team", "Prompts left", "Used", "Draws open on their turn"].forEach((h, i) => {
+      const th = document.createElement("th");
+      th.textContent = h; if (i) th.className = "num";
+      head.appendChild(th);
+    });
+    table.appendChild(head);
+
+    let empty = 0, low = 0;
+    gameState.clubs.forEach(c => {
+      const own = unused[c.id] || 0;
+      const avail = totalUnused - own;
+      const tr = document.createElement("tr");
+      if (nextClub && nextClub.id === c.id) tr.className = "next";
+      const cells = [(nextClub && nextClub.id === c.id ? "▶ " : "") + c.name, own, used[c.id] || 0, avail];
+      cells.forEach((v, i) => {
+        const td = document.createElement("td");
+        td.textContent = v;
+        if (i) td.className = "num";
+        if (i === 3) {
+          if (avail === 0) { td.className += " zero"; empty++; }
+          else if (avail <= 2) { td.className += " low"; low++; }
+        }
+        tr.appendChild(td);
+      });
+      table.appendChild(tr);
+    });
+
+    const wr = document.createElement("tr");
+    [["⭐ Host wildcards", ""], [unused[HOST_POOL] || 0, "num"], [used[HOST_POOL] || 0, "num"], ["any team", "num"]].forEach(c => {
+      const td = document.createElement("td");
+      td.textContent = c[0]; td.className = c[1];
+      wr.appendChild(td);
+    });
+    table.appendChild(wr);
+
+    const body = $("supplyBody");
+    body.innerHTML = "";
+    body.appendChild(table);
+    const note = document.createElement("div");
+    note.className = "supply-note";
+    note.textContent = totalUnused + " prompt" + (totalUnused === 1 ? "" : "s") + " left in total. \u201CDraws open\u201D counts prompts from other teams plus host wildcards, so it shows whether a team's speaker would have anything to draw. ▶ marks who is up next. Only the host sees this box.";
+    body.appendChild(note);
+
+    $("supplySummary").textContent = "📊 Prompt Supply (Host)" +
+      (empty ? " ⚠️ " + empty + " team" + (empty === 1 ? "" : "s") + " with nothing to draw" : (low ? " ⚠️ running low" : ""));
+  }
 
   // ---- Game code, join screen, and QR sharing
   const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

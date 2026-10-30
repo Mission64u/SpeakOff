@@ -10,10 +10,10 @@ A live, multi-team impromptu speaking game for club events. Teams submit topics 
 
 1. Open https://mission64u.github.io/SpeakOff/ and tap **Start a New Game**. This creates a game with a random six-character code.
 2. Under the title, look for **Live · game: YOURCODE**. That means it is connected.
-3. Click **Host Mode** and set a PIN. You can now add, rename, and remove teams (2 to 6) and enter each team's rep name. The **Invite players** box also appears (see [Game codes and QR](#game-codes-and-qr)).
+3. Click **Host Mode** and set a PIN. You can now add, rename, and remove teams (2 to 10) and enter each team's rep name. The **Invite players** box also appears (see [Game codes and QR](#game-codes-and-qr)).
 4. Type the **Timer** and **Grammarian** names in the roles bar.
 5. Share the QR code, join link, or game code with your players.
-6. Let teams submit topics, then start the first round.
+6. Get prompts into each team's pool (see [Importing prompts](#importing-prompts)), then start the first round.
 
 ## How a round works
 
@@ -31,6 +31,55 @@ A live, multi-team impromptu speaking game for club events. Teams submit topics 
 - Type a topic (150 characters max) and tap **Add Topic**. Only a running count is shown. Topics stay hidden until one is drawn.
 - When a speaker is up, rate them on the five criteria and tap **Submit My Rating**.
 
+## Importing prompts
+
+Teams can type topics live, or the host can load a whole list for a team at once. This works well when teams write their prompts ahead of time in Google Drive.
+
+**Prepare the list in Google Drive**
+
+- Have each team put its prompts in a Google Sheet, one prompt per row. Or have each team fill out a Google Form and use the responses sheet.
+- Prompts should be 150 characters or fewer. Longer ones are shortened automatically.
+
+**Load it into the game (host only)**
+
+1. Turn on Host Mode and add the team names.
+2. Open **Import Prompts for a Team** (below the scoreboard and the stage).
+3. Pick the team.
+4. Either paste the prompts, one per line (you can copy a column straight from a Google Sheet), or download the sheet as a file (**File → Download → Comma Separated Values (.csv)**) and choose that file.
+5. For a .csv with several columns, tick **First row is a header** and pick the column that holds the prompts.
+6. Check the preview, then click **Add Prompts**.
+
+**Good to know**
+
+- Duplicates within a team are skipped, and a single import is capped at 300 prompts.
+- Tick **Replace this team's existing prompts** to swap in a corrected list.
+- The game does not read Google Drive on its own. You paste or upload the list yourself.
+- Imported prompts stay hidden from players. Everyone sees only a count until a prompt is drawn.
+- The draw still picks a random prompt from a different team's pool each turn.
+
+## Host wildcards
+
+Host wildcards are prompts that belong to the host instead of a team. Any team can draw them, and they never take a turn or appear on the scoreboard. Use them as a safety net or as a surprise.
+
+- In **Import Prompts**, choose **⭐ Host wildcards** in the team list, then paste or upload prompts as usual.
+- In the Google Sheet script, put **Host** or **Host wildcard** in the Team column.
+- Wildcards are not counted in any team's prompt count, and nobody can tell a wildcard from a team's prompt when it is drawn.
+
+## Prompt Supply (host only)
+
+The **📊 Prompt Supply** box appears when Host Mode is on, below the stage. It helps you spot a team about to run out of prompts before it happens.
+
+| Column | What it means |
+|---|---|
+| Prompts left | Unused prompts that team wrote |
+| Used | Prompts already drawn |
+| Draws open on their turn | Unused prompts from other teams plus host wildcards, which is what the game can draw when that team speaks |
+
+- ▶ marks the team that is up next.
+- A red number means that team would have nothing to draw. A coral number means two or fewer.
+- The box title shows a ⚠️ warning when any team is low, even while the box is closed.
+- Other players never see this box, and it is hidden in Present Mode.
+
 ## Present Mode
 
 Click **Present Mode** to hide setup panels, the roles bar, the evaluation panel, the Grammarian's Report, and the topic boxes, for a clean projector or screen-share view. It affects only the device you click it on.
@@ -42,7 +91,7 @@ Every game is separate, with its own teams, scores, topics, ratings, and notes. 
 - **Start a game:** On the main page, tap **Start a New Game**. Or, in Host Mode, tap **New Game Code** in the Invite players box.
 - **Invite players:** The Invite players box (visible to the host after Host Mode is on) shows the game code, a QR code, and the join link, with Copy buttons. It also shows in Present Mode, so you can project it.
 - **Join a game:** Players scan the QR code or tap the link. Or they open the main page and type the code on the join screen.
-- **Different clubs:** Each club can run its own game with its own code, or several clubs can play as teams in one game (up to six teams).
+- **Different clubs:** Each club can run its own game with its own code, or several clubs can play as teams in one game (up to ten teams).
 - **Fresh game:** Use a new code. Old games stay in the database and are harmless.
 - **Code rules:** Codes are not case-sensitive. A link ending in `?room=` followed by a code (for example `?room=k7m2q9`) opens that game directly. Letters, numbers, hyphens, and underscores only, up to 40 characters.
 - **Keep it private:** A game code works like a password. Anyone who has the code or link can join, so share it only with your players.
