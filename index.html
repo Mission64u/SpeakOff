@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Speak Off:Impromptu Challenge</title>
+<title>Speak Off — Impromptu Challenge</title>
 <style>
   :root {
     --navy: #0B4F6C;
@@ -280,6 +280,13 @@
   .supply-note { font-size: 0.8rem; color: var(--sub); margin-top: 8px; line-height: 1.45; }
   .present .supply-panel { display: none !important; }
 
+  .criteria-strip {
+    display: none; margin: 12px 0; padding: 8px 16px; border-radius: 10px; background: var(--navy); color: #fff;
+    border: 2px solid var(--gold); font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: clamp(0.62rem, 1.7vw, 1rem);
+  }
+  .present .criteria-strip { display: block; }
+
   .join-screen {
     display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 24px; background: var(--bg);
   }
@@ -443,6 +450,8 @@
     <div class="helper">Notes accumulate across the whole event for one closing report — nothing is cleared between rounds.</div>
     <div class="grammarian-log-list" id="grammarianLogList"></div>
   </div>
+
+  <div class="criteria-strip" id="criteriaStrip"></div>
 
   <div class="eval-panel" id="evalPanel">
     <h3>Speech Delivery Evaluation</h3>
@@ -1205,6 +1214,12 @@ const FIREBASE_CONFIG = {
     $("supplySummary").textContent = "📊 Prompt Supply (Host)" +
       (empty ? " ⚠️ " + empty + " team" + (empty === 1 ? "" : "s") + " with nothing to draw" : (low ? " ⚠️ running low" : ""));
   }
+
+  function renderCriteriaStrip(){
+    const el = $("criteriaStrip");
+    if (el) el.textContent = "⭐ Judging: " + CRITERIA.join("  •  ");
+  }
+  renderCriteriaStrip();
 
   // ---- Game code, join screen, and QR sharing
   const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

@@ -20,7 +20,7 @@ A live, multi-team impromptu speaking game for club events. Teams submit topics 
 1. **Draw Topic.** The stage shows which team is up next. The host draws a random topic written by a *different* team.
 2. **Timer.** Choose 30s, 60s, 90s, or 2m, then start the timer when the speaker begins. The clock turns gold at 15 seconds and red at 5. The timer is shared, so everyone sees the same clock.
 3. **Grammarian notes.** The Grammarian types notes and saves them. Notes collect in the Grammarian's Report across the whole event and are never cleared between rounds.
-4. **Rate the speech.** Everyone except the speaker rates five criteria from 1 to 5 and submits once per speaker: Content & Message, Organization, Vocal Variety & Delivery, Body Language & Confidence, and Overall Impact. Averages update live.
+4. **Rate the speech.** Everyone except the speaker rates five criteria from 1 to 5 and submits once per speaker: Confidence & Delivery, Body Language & Gestures, Eye Contact & Audience Awareness, Content & Structure, and Overall Impact. (To change them, edit the `CRITERIA` line in `index.html`.) Averages update live.
 5. **Score.** The host reviews the averages and either taps **Apply to Scoreboard** for the suggested points or uses the +1, +3, +5, and −1 buttons.
 6. **Next Turn.** The used topic is retired and the next team is up.
 
@@ -82,7 +82,7 @@ The **📊 Prompt Supply** box appears when Host Mode is on, below the stage. It
 
 ## Present Mode
 
-Click **Present Mode** to hide setup panels, the roles bar, the evaluation panel, the Grammarian's Report, and the topic boxes, for a clean projector or screen-share view. It affects only the device you click it on.
+Click **Present Mode** to hide setup panels, the roles bar, the evaluation panel, the Grammarian's Report, and the topic boxes, for a clean projector or screen-share view. A one-line strip listing the judging criteria stays visible at the bottom of the speaker area, so the audience can see what is being judged. It affects only the device you click it on.
 
 ## Game codes and QR
 
