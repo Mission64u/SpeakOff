@@ -371,6 +371,7 @@
         <button id="copyCodeBtn">📋 Copy Code</button>
         <button id="copyLinkBtn">🔗 Copy Link</button>
         <button id="newGameBtn">🎲 New Game Code</button>
+        <button id="resetGameBtn">♻️ Reset Game</button>
       </div>
     </div>
   </div>
@@ -623,6 +624,7 @@ const FIREBASE_CONFIG = {
           '<button data-club="' + club.id + '" data-amt="3">+3</button>' +
           '<button data-club="' + club.id + '" data-amt="5">+5</button>' +
           '<button data-club="' + club.id + '" data-amt="-1">−1</button>' +
+          '<button data-setscore="' + club.id + '" title="Type a score (Host Mode)">✏️ Set</button>' +
         '</div>';
       el.appendChild(card);
     });
@@ -893,6 +895,43 @@ const FIREBASE_CONFIG = {
     writeState({ scores });
   }
 
+  function setScoreManually(clubId){
+    if (!hostUnlocked) { toast("Turn on Host Mode to type a score."); return; }
+    const cur = gameState.scores[clubId] || 0;
+    const raw = prompt("Set the score for " + clubById(clubId).name + ":", String(cur));
+    if (raw === null) return;
+    const text = String(raw).trim();
+    const n = Number(text);
+    if (text === "" || !Number.isInteger(n) || n < -999 || n > 9999) { toast("Please enter a whole number."); return; }
+    const scores = { ...gameState.scores, [clubId]: n };
+    writeState({ scores });
+    toast(clubById(clubId).name + " score set to " + n + ".");
+  }
+
+  async function resetGame(){
+    if (!hostUnlocked) { toast("Turn on Host Mode to reset the game."); return; }
+    if (!db || !questionsRef || !votesRef) { toast("Not connected — try again in a moment."); return; }
+    if (!confirm("Reset this game for a rematch?\n\n• All scores go back to 0\n• Every prompt becomes available again\n• Ratings and the Grammarian's notes are cleared\n• Play starts again from the first team\n\nTeams and prompts stay. This cannot be undone.")) return;
+    const ops = [];
+    questions.filter(q => q.used).forEach(q => ops.push({ ref: questionsRef.doc(q.id), upd: { used: false } }));
+    votes.forEach(v => ops.push({ ref: votesRef.doc(v.id), del: true }));
+    try {
+      for (let i = 0; i < ops.length; i += 400) {
+        const batch = db.batch();
+        ops.slice(i, i + 400).forEach(op => { if (op.del) batch.delete(op.ref); else batch.update(op.ref, op.upd); });
+        await batch.commit();
+      }
+      const scores = {};
+      gameState.clubs.forEach(c => { scores[c.id] = 0; });
+      resetMyRatings();
+      writeState({ scores, turnIndex: 0, currentQuestion: null, timerEndAt: null, grammarNotes: [] });
+      toast("Game reset. Ready for the rematch! 🔄");
+    } catch (e) {
+      console.error("reset failed", e);
+      toast("Couldn't finish the reset. Check your connection and try again.");
+    }
+  }
+
   function addClub(){
     if (!hostUnlocked) { toast("Enable Host Mode to add teams."); return; }
     const input = $("newClubInput");
@@ -944,6 +983,9 @@ const FIREBASE_CONFIG = {
     });
     document.querySelectorAll(".score-btns button[data-club]").forEach(b => {
       b.addEventListener("click", () => adjustScore(b.dataset.club, Number(b.dataset.amt)));
+    });
+    document.querySelectorAll("[data-setscore]").forEach(b => {
+      b.addEventListener("click", () => setScoreManually(b.dataset.setscore));
     });
     document.querySelectorAll("[data-submit-for]").forEach(b => {
       b.addEventListener("click", () => submitTopic(b.dataset.submitFor));
@@ -1273,6 +1315,7 @@ const FIREBASE_CONFIG = {
     renderQR();
     $("copyCodeBtn").addEventListener("click", () => copyText(ROOM.toUpperCase(), "Game code copied."));
     $("copyLinkBtn").addEventListener("click", () => copyText(shareLinkUrl(), "Join link copied."));
+    $("resetGameBtn").addEventListener("click", resetGame);
     $("newGameBtn").addEventListener("click", () => {
       if (confirm("Start a brand-new game with a new code? Players will need the new code or QR to join it.")) goToRoom(makeGameCode().toLowerCase());
     });

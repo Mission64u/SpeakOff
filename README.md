@@ -21,7 +21,7 @@ A live, multi-team impromptu speaking game for club events. Teams submit topics 
 2. **Timer.** Choose 30s, 60s, 90s, or 2m, then start the timer when the speaker begins. The clock turns gold at 15 seconds and red at 5. The timer is shared, so everyone sees the same clock.
 3. **Grammarian notes.** The Grammarian types notes and saves them. Notes collect in the Grammarian's Report across the whole event and are never cleared between rounds.
 4. **Rate the speech.** Everyone except the speaker rates five criteria from 1 to 5 and submits once per speaker: Confidence & Delivery, Body Language & Gestures, Eye Contact & Audience Awareness, Content & Structure, and Overall Impact. (To change them, edit the `CRITERIA` line in `index.html`.) Averages update live.
-5. **Score.** The host reviews the averages and either taps **Apply to Scoreboard** for the suggested points or uses the +1, +3, +5, and −1 buttons.
+5. **Score.** The host reviews the averages and either taps **Apply to Scoreboard** for the suggested points or uses the +1, +3, +5, and −1 buttons. With Host Mode on, **✏️ Set** on a team's card lets the host type any whole-number score by hand.
 6. **Next Turn.** The used topic is retired and the next team is up.
 
 ## For players
@@ -92,6 +92,7 @@ Every game is separate, with its own teams, scores, topics, ratings, and notes. 
 - **Invite players:** The Invite players box (visible to the host after Host Mode is on) shows the game code, a QR code, and the join link, with Copy buttons. It also shows in Present Mode, so you can project it.
 - **Join a game:** Players scan the QR code or tap the link. Or they open the main page and type the code on the join screen.
 - **Different clubs:** Each club can run its own game with its own code, or several clubs can play as teams in one game (up to ten teams).
+- **Rematch with the same teams and prompts:** In Host Mode, click **♻️ Reset Game** in the Invite players box and confirm. Scores go back to 0, every prompt becomes available again, ratings and Grammarian notes are cleared, and play restarts from the first team. Teams, prompts, the Host PIN, and the game code stay the same. This cannot be undone.
 - **Fresh game:** Use a new code. Old games stay in the database and are harmless.
 - **Code rules:** Codes are not case-sensitive. A link ending in `?room=` followed by a code (for example `?room=k7m2q9`) opens that game directly. Letters, numbers, hyphens, and underscores only, up to 40 characters.
 - **Keep it private:** A game code works like a password. Anyone who has the code or link can join, so share it only with your players.
