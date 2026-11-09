@@ -139,3 +139,7 @@ Every game is separate, with its own teams, scores, topics, ratings, and notes. 
 | Join screen says to enter a code | The link was missing the game code. Scan the QR code again, or type the code. |
 | QR code shows "QR unavailable" | The QR tool couldn't load. Use the join link or game code instead, or paste the link into any free QR generator. |
 | Changes not showing after an update | Refresh the page, or clear the browser cache. |
+
+---
+
+© 2026 Chiquita M. Hughes. All rights reserved.

@@ -326,6 +326,7 @@
     background: var(--bg); color: var(--ink);
   }
   .share-btns button:hover { background: var(--gold); color: var(--navy-dk); border-color: var(--gold); }
+  .site-footer { text-align: center; color: var(--sub); font-size: 0.75rem; margin-top: 28px; line-height: 1.5; }
   .qr-box { background: #fff; padding: 8px; border-radius: 12px; width: 190px; height: 190px; display: flex; align-items: center; justify-content: center;
     color: #333; font-size: 0.78rem; text-align: center; }
   .qr-box svg { width: 100%; height: 100%; display: block; }
@@ -342,6 +343,7 @@
     <div class="join-error" id="joinError"></div>
     <div class="or">Hosting this event?</div>
     <button class="join-new" id="joinNewBtn">🎲 Start a New Game</button>
+    <div class="site-footer"></div>
   </div>
 </div>
 
@@ -502,6 +504,8 @@
 
   <div class="submit-grid" id="submitGrid"></div>
 
+  <div class="site-footer"></div>
+
   <div class="toast" id="toast"></div>
 </div>
 
@@ -509,6 +513,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
+// ====== COPYRIGHT NOTICE (edit the owner name and year here) ======
+const COPYRIGHT_OWNER = "Chiquita M. Hughes";
+const COPYRIGHT_YEAR = "2026";
 // ====== PASTE YOUR FIREBASE SETTINGS HERE (see setup steps) ======
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDXgbVf81icdYChXXukiIGAneCy90ImryU",
@@ -1019,6 +1026,7 @@ const FIREBASE_CONFIG = {
   render();
 
   function setStatus(msg){ const el = $("connStatus"); if (el) el.textContent = msg; }
+  document.querySelectorAll(".site-footer").forEach(el => { el.textContent = "\u00A9 " + COPYRIGHT_YEAR + " " + COPYRIGHT_OWNER + ". All rights reserved."; });
 
   // ---- Bulk import of prompts (host only)
   function parseDelimited(text, delim){
