@@ -1,4 +1,4 @@
-Copyright (c) 2026 Chiquita M Hughes. All rights reserved.
+Copyright (c) 2026 Chiquita M. Hughes. All rights reserved.
 
 Commercial and non-commercial redistribution, modification, or reuse of this source code, assets, or compiled game files in any form is strictly prohibited without explicit written permission from the copyright holder. 
 
