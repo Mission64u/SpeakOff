@@ -1,0 +1,5 @@
+Copyright (c) 2026 Chiquita M Hughes. All rights reserved.
+
+Commercial and non-commercial redistribution, modification, or reuse of this source code, assets, or compiled game files in any form is strictly prohibited without explicit written permission from the copyright holder. 
+
+This repository is publicly visible for hosting, portfolio display, and educational review purposes only, in accordance with the GitHub Terms of Service.
