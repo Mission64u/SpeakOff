@@ -1,5 +1,9 @@
 Copyright (c) 2026 Chiquita M. Hughes. All rights reserved.
 
-Commercial and non-commercial redistribution, modification, or reuse of this source code, assets, or compiled game files in any form is strictly prohibited without explicit written permission from the copyright holder. 
+This software, including its source code, assets, and compiled files, may not be copied, redistributed, modified, or reused, in whole or in part, for commercial or non-commercial purposes without explicit written permission from the copyright holder.
 
-This repository is publicly visible for hosting, portfolio display, and educational review purposes only, in accordance with the GitHub Terms of Service.
+This repository is publicly visible for hosting, portfolio display, and educational review. As provided by the GitHub Terms of Service, others may view and fork this repository on GitHub, but no other rights are granted.
+
+Third-party libraries used by this software remain subject to their own licenses.
+
+To request permission, contact: chughes@m6learning.com
